@@ -89,21 +89,11 @@ CI / automation suggestions
 - Add a CI workflow to run backend unit tests and contract unit tests (Rust `cargo test`) on push/PR.
 - Add a linting/format check for Rust (rustfmt/clippy) and JS (eslint / prettier) in CI.
 
-Next steps (recommended)
-
-1. Replace the placeholder Solidity contracts in `contracts/` with Rust-based smart contracts that target Linera. If you want, I can scaffold an initial Rust contract template and tests.
-2. Add a simple wallet-connect example in `frontend/` using the official Linera/Linear wallet SDK (or generic wallet provider) so users can connect and sign transactions.
-3. Add IPFS pinning helper endpoints in `backend/` to pin assets and return token URIs.
-4. Add example contract integration tests that exercise minting and game flows against a local devnet.
 
 Contacts & references
 
 - Linera / chain docs: follow the official chain documentation for contract toolchain and SDK details.
 - IPFS / Pinata docs for pinning APIs.
 
-If you'd like, I can now:
-- Replace the Solidity placeholders in `contracts/` with a Rust contract template and `cargo` tests; or
-- Add a wallet-connect example in `frontend/` that demonstrates connecting + signing.
 
-Tell me which of the next steps you want me to implement and I'll continue.
 
