@@ -57,14 +57,21 @@ curl http://localhost:3001/api/metadata/1
 
 3) Contracts (Rust / Linera)
 
-Notes: Contracts for Linera must be written in Rust and tested with the Rust toolchain. The `contracts/` folder currently contains Solidity placeholders from the initial scaffold. You should replace them with Rust contract projects that target your chain's SDK (install `rustup`, `cargo`, and the chain-specific CLI/devnet tools).
+The contracts are implemented in Rust for the Linera blockchain. See `contracts/README.md` for full documentation.
 
-Typical contract dev loop (example):
+Quick build and test:
 
-- Install Rust toolchain: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-- Add chain SDK/CLI as required by the Linera docs
-- Build and run unit tests: `cargo test`
-- Run integration tests or local devnet (follow Linera's local devnet instructions)
+```bash
+cd contracts
+cargo test
+cargo build --release --target wasm32-unknown-unknown
+```
+
+The WASM bytecode will be at:
+- `target/wasm32-unknown-unknown/release/drawn_contract.wasm`
+- `target/wasm32-unknown-unknown/release/drawn_service.wasm`
+
+See `contracts/EXAMPLES.md` for GraphQL query/mutation examples.
 
 Testing
 
