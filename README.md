@@ -2,7 +2,19 @@
 
 Drawn is a modular dApp scaffold that separates concerns across three layers: frontend, backend, and blockchain contracts. This repository provides starter code and guidance so you can iterate quickly on the UI, API, and smart contract logic.
 
-Key design principles
+## 🚀 Quick Start (Buildathon Submission)
+
+**For buildathon judges and testers:**
+
+```bash
+docker compose up --force-recreate
+```
+
+Then visit http://localhost:5173
+
+See [`BUILDATHON.md`](./BUILDATHON.md) for complete instructions and [`QUICK_REFERENCE.md`](./QUICK_REFERENCE.md) for a summary.
+
+## Key design principles
 - Clear separation of concerns: UI (frontend), application & persistence (backend), and on-chain logic (contracts).
 - Practical defaults: Next.js + Tailwind for frontend, Node/Express for lightweight backend APIs, IPFS for asset storage.
 - Chain-accurate contracts: This project targets Linera-style Rust smart contracts (not Solidity). See the Contracts section for details.
