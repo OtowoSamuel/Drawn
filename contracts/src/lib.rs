@@ -5,14 +5,14 @@ use linera_sdk::{
 };
 use serde::{Deserialize, Serialize};
 
-pub struct DrawnAbi;
+pub struct TicTacToeAbi;
 
-impl ContractAbi for DrawnAbi {
+impl ContractAbi for TicTacToeAbi {
     type Operation = Operation;
     type Response = OperationResponse;
 }
 
-impl ServiceAbi for DrawnAbi {
+impl ServiceAbi for TicTacToeAbi {
     type Query = Request;
     type QueryResponse = Response;
 }
@@ -20,57 +20,74 @@ impl ServiceAbi for DrawnAbi {
 /// Response types for operations
 #[derive(Debug, Serialize, Deserialize)]
 pub enum OperationResponse {
-    /// NFT minted successfully with token ID
-    Minted(u64),
-    /// Gameplay score updated
-    ScoreUpdated,
-    /// Reward allocated
-    RewardAllocated,
-    /// Reward claimed
-    RewardClaimed(u64),
+    /// Game created successfully with game ID
+    GameCreated(u64),
+    /// Move made successfully
+    MoveMade,
+    /// Game ended with winner or draw
+    GameEnded(GameResult),
 }
 
-/// Operations that can be performed on the Drawn contract
+/// Result of a completed game
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum GameResult {
+    Winner(String), // Player address who won
+    Draw,
+}
+
+/// Operations that can be performed on the Tic-Tac-Toe contract
 #[derive(Debug, Deserialize, Serialize, GraphQLMutationRoot)]
 pub enum Operation {
-    /// Mint a new sticker NFT to an owner with metadata URI
-    MintSticker {
-        owner: String,
-        metadata_uri: String,
-        sticker_type: String,
+    /// Create a new game (either single player vs AI or two player)
+    CreateGame {
+        player_x: String,
+        player_o: Option<String>, // None for single player vs AI
     },
     
-    /// Update gameplay score for a token
-    UpdateScore {
-        token_id: u64,
-        score: u64,
-    },
-    
-    /// Allocate rewards to a player
-    AllocateReward {
+    /// Make a move in an existing game
+    MakeMove {
+        game_id: u64,
         player: String,
-        amount: u64,
+        position: u8, // 0-8 representing board positions
     },
-    
-    /// Claim pending rewards
-    ClaimRewards,
 }
 
-/// Represents a sticker NFT
-#[derive(Debug, Clone, Serialize, Deserialize, async_graphql::SimpleObject)]
-pub struct Sticker {
-    pub token_id: u64,
-    pub owner: String,
-    pub metadata_uri: String,
-    pub sticker_type: String,
-    pub minted_at: u64, // timestamp
+/// Player symbol in the game
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, async_graphql::Enum)]
+pub enum PlayerSymbol {
+    X,
+    O,
 }
 
-/// Player gameplay data
+/// Game status
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, async_graphql::Enum)]
+pub enum GameStatus {
+    Active,
+    XWins,
+    OWins,
+    Draw,
+}
+
+/// Represents a Tic-Tac-Toe game
 #[derive(Debug, Clone, Serialize, Deserialize, async_graphql::SimpleObject)]
-pub struct PlayerData {
+pub struct Game {
+    pub game_id: u64,
+    pub player_x: String,
+    pub player_o: String, // "AI" for single player mode
+    pub board: Vec<Option<PlayerSymbol>>, // 9 positions
+    pub current_turn: PlayerSymbol,
+    pub status: GameStatus,
+    pub created_at: u64, // timestamp
+    pub winner: Option<String>,
+}
+
+/// Player statistics
+#[derive(Debug, Clone, Serialize, Deserialize, async_graphql::SimpleObject)]
+pub struct PlayerStats {
     pub address: String,
-    pub total_score: u64,
-    pub stickers_owned: Vec<u64>,
-    pub pending_rewards: u64,
+    pub games_played: u64,
+    pub games_won: u64,
+    pub games_lost: u64,
+    pub games_drawn: u64,
 }
+

@@ -1,25 +1,25 @@
 [package]
-name = "drawn"
+name = "tictactoe"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 async-graphql = { version = "=7.0.17", default-features = false }
-linera-sdk = "0.15.3"
+linera-sdk = "0.15.8"
 futures = { version = "0.3" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
 
 [dev-dependencies]
-linera-sdk = { version = "0.15.3", features = ["test", "wasmer"] }
+linera-sdk = { version = "0.15.8", features = ["test", "wasmer"] }
 tokio = { version = "1.40", features = ["rt", "sync"] }
 
 [[bin]]
-name = "drawn_contract"
+name = "tictactoe_contract"
 path = "src/contract.rs"
 
 [[bin]]
-name = "drawn_service"
+name = "tictactoe_service"
 path = "src/service.rs"
 
 [profile.release]

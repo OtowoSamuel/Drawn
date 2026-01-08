@@ -10,65 +10,70 @@ use linera_sdk::{
     ServiceRuntime,
 };
 
-use drawn::Operation;
-use self::state::DrawnState;
+use tictactoe::{Operation, Game, PlayerStats};
+use self::state::TicTacToeState;
 
-pub struct DrawnService {
-    state: DrawnState,
+pub struct TicTacToeService {
+    state: Arc<TicTacToeState>,
     runtime: Arc<ServiceRuntime<Self>>,
 }
 
-linera_sdk::service!(DrawnService);
+linera_sdk::service!(TicTacToeService);
 
-impl WithServiceAbi for DrawnService {
-    type Abi = drawn::DrawnAbi;
+impl WithServiceAbi for TicTacToeService {
+    type Abi = tictactoe::TicTacToeAbi;
 }
 
-impl Service for DrawnService {
+impl Service for TicTacToeService {
     type Parameters = ();
 
     async fn new(runtime: ServiceRuntime<Self>) -> Self {
-        let state = DrawnState::load(runtime.root_view_storage_context())
+        let state = TicTacToeState::load(runtime.root_view_storage_context())
             .await
             .expect("Failed to load state");
-        DrawnService {
-            state,
+        TicTacToeService {
+            state: Arc::new(state),
             runtime: Arc::new(runtime),
         }
     }
 
     async fn handle_query(&self, query: Self::Query) -> Self::QueryResponse {
-        let next_token_id = *self.state.next_token_id.get();
-        let total_minted = *self.state.total_minted.get();
-        
-        Schema::build(
+        let schema = Schema::build(
             QueryRoot {
-                next_token_id,
-                total_minted,
+                state: self.state.clone(),
             },
             Operation::mutation_root(self.runtime.clone()),
             EmptySubscription,
         )
-        .finish()
-        .execute(query)
-        .await
+        .finish();
+        
+        schema.execute(query).await
     }
 }
 
 struct QueryRoot {
-    next_token_id: u64,
-    total_minted: u64,
+    state: Arc<TicTacToeState>,
 }
 
 #[Object]
 impl QueryRoot {
-    /// Get the next token ID that will be minted
-    async fn next_token_id(&self) -> u64 {
-        self.next_token_id
+    /// Get the next game ID that will be created
+    async fn next_game_id(&self) -> u64 {
+        *self.state.next_game_id.get()
     }
     
-    /// Get total number of stickers minted
-    async fn total_minted(&self) -> u64 {
-        self.total_minted
+    /// Get total number of games created
+    async fn total_games(&self) -> u64 {
+        *self.state.total_games.get()
+    }
+    
+    /// Get a specific game by ID
+    async fn game(&self, game_id: u64) -> Option<Game> {
+        self.state.get_game(game_id).await
+    }
+    
+    /// Get player statistics
+    async fn player_stats(&self, address: String) -> Option<PlayerStats> {
+        self.state.get_player_stats(&address).await
     }
 }

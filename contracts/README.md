@@ -4,18 +4,19 @@ This folder contains Rust smart contracts for the Linera blockchain.
 
 ## Contract Structure
 
-The Drawn application implements an NFT sticker game with the following features:
+The Tic-Tac-Toe application implements a decentralized game with the following features:
 
-- **NFT Minting** — Mint unique sticker NFTs with metadata URIs (IPFS/Pinata)
-- **Gameplay State** — Track player scores and sticker collections
-- **Rewards System** — Allocate and claim rewards based on gameplay
+- **Game Creation** — Create new two-player or single-player (vs AI) games
+- **Move Validation** — Enforce turn-based gameplay with position validation
+- **Winner Detection** — Automatic detection of wins and draws
+- **Player Statistics** — Track wins, losses, and draws for each player
 
 ## Files
 
 - `Cargo.toml` — Rust dependencies and build configuration
 - `src/lib.rs` — ABI definition and operations (mutations)
-- `src/state.rs` — Application state (NFTs, players, scores, rewards)
-- `src/contract.rs` — Contract logic (business layer, state mutations)
+- `src/state.rs` — Application state (games, player stats)
+- `src/contract.rs` — Contract logic (game rules, win detection)
 - `src/service.rs` — GraphQL service (read-only query layer)
 
 ## Prerequisites
@@ -27,10 +28,11 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 rustup target add wasm32-unknown-unknown
 ```
 
-Install Linera CLI (follow official docs):
+Install Linera CLI (v0.15.8):
 
 ```bash
-# See https://linera.dev for the latest installation instructions
+cargo install --locked linera-service@0.15.8
+cargo install --locked linera-storage-service@0.15.8
 ```
 
 ## Quick Start
@@ -43,8 +45,8 @@ cargo build --release --target wasm32-unknown-unknown
 ```
 
 This creates two WASM files:
-- `target/wasm32-unknown-unknown/release/drawn_contract.wasm`
-- `target/wasm32-unknown-unknown/release/drawn_service.wasm`
+- `target/wasm32-unknown-unknown/release/tictactoe_contract.wasm`
+- `target/wasm32-unknown-unknown/release/tictactoe_service.wasm`
 
 ### 2. Run Tests
 
