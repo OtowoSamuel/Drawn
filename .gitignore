@@ -11,3 +11,6 @@ contracts/node_modules/
 
 # Rust build artifacts
 contracts/target/
+
+# Templates and others
+inspo
