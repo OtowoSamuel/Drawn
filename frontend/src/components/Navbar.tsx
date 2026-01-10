@@ -9,7 +9,7 @@ interface NavbarProps {
 
 const Navbar = ({ username }: NavbarProps) => {
   const location = useLocation();
-  
+
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Dashboard", path: "/dashboard" },
@@ -51,7 +51,10 @@ const Navbar = ({ username }: NavbarProps) => {
 
           {/* User Badge */}
           {username ? (
-            <Badge variant="neon" className="flex items-center gap-2 px-3 py-1.5">
+            <Badge
+              variant="neon"
+              className="flex items-center gap-2 px-3 py-1.5"
+            >
               <User className="h-4 w-4" />
               <span>{username}</span>
             </Badge>

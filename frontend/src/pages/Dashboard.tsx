@@ -15,7 +15,7 @@ interface NFTItem {
 
 const Dashboard = () => {
   const [username, setUsername] = useState("");
-  
+
   useEffect(() => {
     const storedUsername = localStorage.getItem("drawn_username");
     if (storedUsername) {
@@ -31,10 +31,25 @@ const Dashboard = () => {
   };
 
   const nftCollection: NFTItem[] = [
-    { id: "001", name: "Rainbow Unicorn", imageUrl: "/placeholder.svg", likes: 234 },
+    {
+      id: "001",
+      name: "Rainbow Unicorn",
+      imageUrl: "/placeholder.svg",
+      likes: 234,
+    },
     { id: "002", name: "Cyber Cat", imageUrl: "/placeholder.svg", likes: 189 },
-    { id: "003", name: "Space Rocket", imageUrl: "/placeholder.svg", likes: 312 },
-    { id: "004", name: "Crystal Gem", imageUrl: "/placeholder.svg", likes: 156 },
+    {
+      id: "003",
+      name: "Space Rocket",
+      imageUrl: "/placeholder.svg",
+      likes: 312,
+    },
+    {
+      id: "004",
+      name: "Crystal Gem",
+      imageUrl: "/placeholder.svg",
+      likes: 156,
+    },
   ];
 
   return (
@@ -43,7 +58,8 @@ const Dashboard = () => {
         {/* Welcome Header */}
         <div className="mb-8 animate-fade-in">
           <h1 className="text-2xl font-bold mb-1">
-            Welcome Back, <span className="text-gradient-neon">{username || "Player"}</span>
+            Welcome Back,{" "}
+            <span className="text-gradient-neon">{username || "Player"}</span>
           </h1>
           <p className="text-muted-foreground">Ready to collect and compete?</p>
         </div>
@@ -52,19 +68,27 @@ const Dashboard = () => {
         <div className="grid gap-4 md:grid-cols-3 mb-8">
           <Card className="stat-card">
             <CardContent className="p-6">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Total XP</p>
-              <p className="text-4xl font-bold">{stats.totalXP.toLocaleString()}</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                Total XP
+              </p>
+              <p className="text-4xl font-bold">
+                {stats.totalXP.toLocaleString()}
+              </p>
             </CardContent>
           </Card>
           <Card className="stat-card">
             <CardContent className="p-6">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Global Rank</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                Global Rank
+              </p>
               <p className="text-4xl font-bold">{stats.globalRank}</p>
             </CardContent>
           </Card>
           <Card className="stat-card">
             <CardContent className="p-6">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Win Rate</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                Win Rate
+              </p>
               <p className="text-4xl font-bold">{stats.winRate}%</p>
             </CardContent>
           </Card>
@@ -87,12 +111,12 @@ const Dashboard = () => {
         {/* NFT Collection */}
         <div>
           <h2 className="text-xl font-bold mb-6">My Collection</h2>
-          
+
           {nftCollection.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {nftCollection.map((nft, index) => (
-                <Card 
-                  key={nft.id} 
+                <Card
+                  key={nft.id}
                   className="nft-card group cursor-pointer"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -119,7 +143,9 @@ const Dashboard = () => {
             <Card className="border-dashed border-2 border-border bg-transparent">
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">No NFTs in your collection yet</p>
+                <p className="text-muted-foreground mb-4">
+                  No NFTs in your collection yet
+                </p>
                 <Link to="/create-nft">
                   <Button variant="neon">Create Your First NFT</Button>
                 </Link>

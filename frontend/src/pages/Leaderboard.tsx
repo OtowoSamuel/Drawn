@@ -1,4 +1,11 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Medal, Crown, User, TrendingUp } from "lucide-react";
@@ -18,17 +25,95 @@ const Leaderboard = () => {
   const currentUsername = localStorage.getItem("drawn_username") || "Player";
 
   const players: Player[] = [
-    { rank: 1, username: "CryptoKing", xp: 12450, wins: 156, losses: 23, winRate: 87 },
-    { rank: 2, username: "NFTMaster", xp: 11200, wins: 142, losses: 31, winRate: 82 },
-    { rank: 3, username: "DiamondHands", xp: 10800, wins: 138, losses: 35, winRate: 80 },
-    { rank: 4, username: "TopRanker", xp: 9500, wins: 124, losses: 42, winRate: 75 },
-    { rank: 5, username: "BattleAce", xp: 8900, wins: 118, losses: 48, winRate: 71 },
-    { rank: 6, username: "ProGamer", xp: 8200, wins: 112, losses: 54, winRate: 67 },
-    { rank: 7, username: "StarPlayer", xp: 7600, wins: 105, losses: 58, winRate: 64 },
-    { rank: 8, username: "ChampionX", xp: 7100, wins: 98, losses: 62, winRate: 61 },
-    { rank: 9, username: "VictorySeeker", xp: 6500, wins: 92, losses: 68, winRate: 58 },
-    { rank: 10, username: "RisingStar", xp: 6000, wins: 86, losses: 72, winRate: 54 },
-    { rank: 11, username: currentUsername, xp: 3450, wins: 45, losses: 22, winRate: 67, isCurrentUser: true },
+    {
+      rank: 1,
+      username: "CryptoKing",
+      xp: 12450,
+      wins: 156,
+      losses: 23,
+      winRate: 87,
+    },
+    {
+      rank: 2,
+      username: "NFTMaster",
+      xp: 11200,
+      wins: 142,
+      losses: 31,
+      winRate: 82,
+    },
+    {
+      rank: 3,
+      username: "DiamondHands",
+      xp: 10800,
+      wins: 138,
+      losses: 35,
+      winRate: 80,
+    },
+    {
+      rank: 4,
+      username: "TopRanker",
+      xp: 9500,
+      wins: 124,
+      losses: 42,
+      winRate: 75,
+    },
+    {
+      rank: 5,
+      username: "BattleAce",
+      xp: 8900,
+      wins: 118,
+      losses: 48,
+      winRate: 71,
+    },
+    {
+      rank: 6,
+      username: "ProGamer",
+      xp: 8200,
+      wins: 112,
+      losses: 54,
+      winRate: 67,
+    },
+    {
+      rank: 7,
+      username: "StarPlayer",
+      xp: 7600,
+      wins: 105,
+      losses: 58,
+      winRate: 64,
+    },
+    {
+      rank: 8,
+      username: "ChampionX",
+      xp: 7100,
+      wins: 98,
+      losses: 62,
+      winRate: 61,
+    },
+    {
+      rank: 9,
+      username: "VictorySeeker",
+      xp: 6500,
+      wins: 92,
+      losses: 68,
+      winRate: 58,
+    },
+    {
+      rank: 10,
+      username: "RisingStar",
+      xp: 6000,
+      wins: 86,
+      losses: 72,
+      winRate: 54,
+    },
+    {
+      rank: 11,
+      username: currentUsername,
+      xp: 3450,
+      wins: 45,
+      losses: 22,
+      winRate: 67,
+      isCurrentUser: true,
+    },
   ];
 
   const getRankIcon = (rank: number) => {
@@ -66,17 +151,23 @@ const Leaderboard = () => {
         {/* Top 3 Featured Cards */}
         <div className="grid gap-4 md:grid-cols-3 mb-8">
           {topPlayers.map((player, index) => (
-            <Card 
-              key={player.rank} 
+            <Card
+              key={player.rank}
               className={`border-border bg-card card-glow ${
-                index === 0 ? "md:order-2" : index === 1 ? "md:order-1" : "md:order-3"
+                index === 0
+                  ? "md:order-2"
+                  : index === 1
+                  ? "md:order-1"
+                  : "md:order-3"
               }`}
             >
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg flex items-center gap-2">
                     {getRankIcon(player.rank)}
-                    <span className={player.rank === 1 ? "text-gradient-neon" : ""}>
+                    <span
+                      className={player.rank === 1 ? "text-gradient-neon" : ""}
+                    >
                       {player.username}
                     </span>
                   </CardTitle>
@@ -89,11 +180,15 @@ const Leaderboard = () => {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Total XP</p>
-                    <p className="text-xl font-bold text-primary">{player.xp.toLocaleString()}</p>
+                    <p className="text-xl font-bold text-primary">
+                      {player.xp.toLocaleString()}
+                    </p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Win Rate</p>
-                    <p className="text-xl font-bold text-success">{player.winRate}%</p>
+                    <p className="text-xl font-bold text-success">
+                      {player.winRate}%
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -116,18 +211,22 @@ const Leaderboard = () => {
                   <TableHead className="w-16">Rank</TableHead>
                   <TableHead>Player</TableHead>
                   <TableHead className="text-right">XP</TableHead>
-                  <TableHead className="text-right hidden sm:table-cell">Wins</TableHead>
-                  <TableHead className="text-right hidden sm:table-cell">Losses</TableHead>
+                  <TableHead className="text-right hidden sm:table-cell">
+                    Wins
+                  </TableHead>
+                  <TableHead className="text-right hidden sm:table-cell">
+                    Losses
+                  </TableHead>
                   <TableHead className="text-right">Win Rate</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {players.map((player) => (
-                  <TableRow 
+                  <TableRow
                     key={player.rank}
                     className={`border-border transition-colors ${
-                      player.isCurrentUser 
-                        ? "bg-primary/10 hover:bg-primary/15 border-l-2 border-l-primary" 
+                      player.isCurrentUser
+                        ? "bg-primary/10 hover:bg-primary/15 border-l-2 border-l-primary"
                         : "hover:bg-secondary/50"
                     }`}
                   >
@@ -141,10 +240,18 @@ const Leaderboard = () => {
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary">
                           <User className="h-4 w-4 text-muted-foreground" />
                         </div>
-                        <span className={player.isCurrentUser ? "text-primary font-semibold" : ""}>
+                        <span
+                          className={
+                            player.isCurrentUser
+                              ? "text-primary font-semibold"
+                              : ""
+                          }
+                        >
                           {player.username}
                           {player.isCurrentUser && (
-                            <Badge variant="neon" className="ml-2 text-xs">You</Badge>
+                            <Badge variant="neon" className="ml-2 text-xs">
+                              You
+                            </Badge>
                           )}
                         </span>
                       </div>
@@ -160,8 +267,20 @@ const Leaderboard = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <TrendingUp className={`h-4 w-4 ${player.winRate >= 50 ? "text-success" : "text-destructive"}`} />
-                        <span className={player.winRate >= 50 ? "text-success" : "text-destructive"}>
+                        <TrendingUp
+                          className={`h-4 w-4 ${
+                            player.winRate >= 50
+                              ? "text-success"
+                              : "text-destructive"
+                          }`}
+                        />
+                        <span
+                          className={
+                            player.winRate >= 50
+                              ? "text-success"
+                              : "text-destructive"
+                          }
+                        >
                           {player.winRate}%
                         </span>
                       </div>

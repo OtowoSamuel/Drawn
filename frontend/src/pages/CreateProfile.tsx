@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +16,9 @@ import Layout from "@/components/Layout";
 const CreateProfile = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-  const [playerType, setPlayerType] = useState<"player1" | "player2" | null>(null);
+  const [playerType, setPlayerType] = useState<"player1" | "player2" | null>(
+    null
+  );
 
   const handleContinue = () => {
     if (username && playerType) {
@@ -32,14 +40,21 @@ const CreateProfile = () => {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent">
                 <User className="h-8 w-8 text-primary-foreground" />
               </div>
-              <CardTitle className="text-2xl font-bold">Create Your Profile</CardTitle>
-              <CardDescription>Enter the arena with your unique identity</CardDescription>
+              <CardTitle className="text-2xl font-bold">
+                Create Your Profile
+              </CardTitle>
+              <CardDescription>
+                Enter the arena with your unique identity
+              </CardDescription>
             </CardHeader>
-            
+
             <CardContent className="space-y-6 pt-4">
               {/* Username Input */}
               <div className="space-y-2">
-                <label htmlFor="username" className="text-sm font-medium text-muted-foreground">
+                <label
+                  htmlFor="username"
+                  className="text-sm font-medium text-muted-foreground"
+                >
                   Username
                 </label>
                 <Input
@@ -69,13 +84,32 @@ const CreateProfile = () => {
                     }`}
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <div className={`p-2 rounded-lg ${playerType === "player1" ? "bg-primary" : "bg-muted"}`}>
-                        <User className={`h-5 w-5 ${playerType === "player1" ? "text-primary-foreground" : "text-muted-foreground"}`} />
+                      <div
+                        className={`p-2 rounded-lg ${
+                          playerType === "player1" ? "bg-primary" : "bg-muted"
+                        }`}
+                      >
+                        <User
+                          className={`h-5 w-5 ${
+                            playerType === "player1"
+                              ? "text-primary-foreground"
+                              : "text-muted-foreground"
+                          }`}
+                        />
                       </div>
-                      <span className={`font-medium ${playerType === "player1" ? "text-primary" : "text-foreground"}`}>
+                      <span
+                        className={`font-medium ${
+                          playerType === "player1"
+                            ? "text-primary"
+                            : "text-foreground"
+                        }`}
+                      >
                         Player 1
                       </span>
-                      <Badge variant={playerType === "player1" ? "neon" : "muted"} className="text-xs">
+                      <Badge
+                        variant={playerType === "player1" ? "neon" : "muted"}
+                        className="text-xs"
+                      >
                         X Moves First
                       </Badge>
                     </div>
@@ -93,13 +127,32 @@ const CreateProfile = () => {
                     }`}
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <div className={`p-2 rounded-lg ${playerType === "player2" ? "bg-accent" : "bg-muted"}`}>
-                        <Users className={`h-5 w-5 ${playerType === "player2" ? "text-accent-foreground" : "text-muted-foreground"}`} />
+                      <div
+                        className={`p-2 rounded-lg ${
+                          playerType === "player2" ? "bg-accent" : "bg-muted"
+                        }`}
+                      >
+                        <Users
+                          className={`h-5 w-5 ${
+                            playerType === "player2"
+                              ? "text-accent-foreground"
+                              : "text-muted-foreground"
+                          }`}
+                        />
                       </div>
-                      <span className={`font-medium ${playerType === "player2" ? "text-accent" : "text-foreground"}`}>
+                      <span
+                        className={`font-medium ${
+                          playerType === "player2"
+                            ? "text-accent"
+                            : "text-foreground"
+                        }`}
+                      >
                         Player 2
                       </span>
-                      <Badge variant={playerType === "player2" ? "purple" : "muted"} className="text-xs">
+                      <Badge
+                        variant={playerType === "player2" ? "purple" : "muted"}
+                        className="text-xs"
+                      >
                         O Counter
                       </Badge>
                     </div>
