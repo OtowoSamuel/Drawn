@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Heart, Sparkles } from "lucide-react";
 import Layout from "@/components/Layout";
+import { ComingSoon } from "@/components/ComingSoon";
 
 interface NFTItem {
   id: string;
@@ -94,64 +95,28 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons - Disabled */}
         <div className="flex flex-wrap gap-4 mb-10">
-          <Link to="/create-nft">
+          <Link to="/game">
             <Button variant="neon" size="lg">
               <Plus className="h-5 w-5" />
-              Create New Sticker
+              Play Tic-Tac-Toe
             </Button>
           </Link>
-          <Button variant="neon-destructive" size="lg">
-            <Trash2 className="h-5 w-5" />
-            Delete Sticker
-          </Button>
         </div>
 
-        {/* NFT Collection */}
+        {/* NFT Collection - Coming Soon */}
         <div>
-          <h2 className="text-xl font-bold mb-6">My Collection</h2>
-
-          {nftCollection.length > 0 ? (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {nftCollection.map((nft, index) => (
-                <Card
-                  key={nft.id}
-                  className="nft-card group cursor-pointer"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="aspect-square bg-secondary relative overflow-hidden">
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/20">
-                      <Sparkles className="h-12 w-12 text-muted-foreground/50" />
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-1">{nft.name}</h3>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <span>#{nft.id}</span>
-                      <div className="flex items-center gap-1">
-                        <Heart className="h-4 w-4 text-primary" />
-                        <span>{nft.likes}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card className="border-dashed border-2 border-border bg-transparent">
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">
-                  No NFTs in your collection yet
-                </p>
-                <Link to="/create-nft">
-                  <Button variant="neon">Create Your First NFT</Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold mb-2">NFT Collection</h2>
+            <p className="text-sm text-muted-foreground">
+              Create and collect unique NFTs from your victories
+            </p>
+          </div>
+          <ComingSoon 
+            feature="NFT Collection" 
+            description="Mint unique NFTs, build your collection, and showcase your achievements. This feature is under development."
+          />
         </div>
       </div>
     </Layout>

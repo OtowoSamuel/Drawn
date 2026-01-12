@@ -1,149 +1,261 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Swords, Trophy, Clock, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, Trophy, AlertCircle } from "lucide-react";
 import Layout from "@/components/Layout";
 import TicTacToe from "@/components/TicTacToe";
-
-type Player = "X" | "O";
-type GameStatus = "playing" | "win" | "draw";
+import { 
+  startGame, 
+  makeMove, 
+  pollGameState,
+  parseGameResult,
+  getCurrentPlayer,
+  type GameState,
+  ENV 
+} from "@/lib/linera";
+import { useToast } from "@/hooks/use-toast";
 
 const Game = () => {
   const navigate = useNavigate();
-  const [gameEnded, setGameEnded] = useState(false);
-  const [gameResult, setGameResult] = useState<{ winner: Player | null; status: GameStatus } | null>(null);
+  const { toast } = useToast();
+  
+  // Game state
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  
+  // Game result
+  const [gameOver, setGameOver] = useState(false);
+  const [winner, setWinner] = useState<'X' | 'O' | 'Draw' | null>(null);
 
-  // Mock match data
-  const matchData = {
-    player1: { name: "NeonKnight", nft: "Cyber Warrior", stake: 100 },
-    player2: { name: "ShadowByte", nft: "Phantom Striker", stake: 100 },
-    totalStake: 200,
-  };
+  // Poll for game state updates
+  useEffect(() => {
+    const stopPolling = pollGameState(
+      (state) => {
+        setGameState(state);
+        // Only check game over from finished flag
+        if (state.board.finished) {
+          setGameOver(true);
+        }
+      },
+      (error) => {
+        console.error('Polling error:', error);
+      },
+      1000 // Poll every second
+    );
 
-  const handleGameEnd = (result: { winner: Player | null; status: GameStatus }) => {
-    setGameEnded(true);
-    setGameResult(result);
-    
-    // Navigate to match result after a short delay
-    setTimeout(() => {
-      navigate("/match-result", { 
-        state: { 
-          result: result.winner === "X" ? "win" : result.winner === "O" ? "loss" : "draw",
-          opponent: matchData.player2.name,
-          stake: matchData.totalStake
-        } 
+    return stopPolling;
+  }, []);
+
+  const handleStartGame = async () => {
+    setLoading(true);
+    try {
+      // Get owner address from environment
+      const ownerAddress = import.meta.env.VITE_OWNER_ADDRESS;
+      
+      console.log("=== Starting Game ===");
+      console.log("Owner Address:", ownerAddress);
+      console.log("Main Chain URL:", ENV.MAIN_CHAIN_URL);
+      
+      if (!ownerAddress) {
+        throw new Error("Owner address not configured. Check .env file");
+      }
+      
+      // For demo: same owner plays both sides
+      console.log("Calling startGame mutation...");
+      const result = await startGame([ownerAddress, ownerAddress]);
+      console.log("Start game result:", result);
+      
+      toast({
+        title: "Game Started!",
+        description: "Make your move!",
       });
-    }, 2000);
+      
+      setGameOver(false);
+      setWinner(null);
+      
+    } catch (error: any) {
+      console.error("=== Start Game Error ===");
+      console.error("Error object:", error);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+      
+      toast({
+        title: "Error Starting Game",
+        description: error.message || "Failed to start game",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <Layout>
-      <div className="container px-4 py-8">
-        <div className="mx-auto max-w-4xl space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/lobby")}>
-              <ArrowLeft className="h-4 w-4" />
-              Back to Lobby
-            </Button>
-            <Badge variant="neon" className="flex items-center gap-2">
-              <Swords className="h-4 w-4" />
-              Live Match
-            </Badge>
-          </div>
+  const handleMove = async (position: number) => {
+    if (processing || gameOver) return;
 
-          {/* Match Info Header */}
-          <Card className="border-border bg-gradient-to-r from-primary/10 via-card to-accent/10">
-            <CardHeader className="pb-4">
+    try {
+      setProcessing(true);
+      console.log(`Making move at position ${position}`);
+      
+      // Mutation returns transaction hash, game state updates via polling
+      await makeMove(position);
+      console.log("Move submitted successfully");
+      
+    } catch (error: any) {
+      toast({
+        title: "Move Failed",
+        description: error.message || "Failed to make move",
+        variant: "destructive",
+      });
+      console.error("Move error:", error);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  // Show start screen if no game active
+  if (!gameState || !gameState.players) {
+    return (
+      <Layout>
+        <div className="container max-w-2xl mx-auto px-4 py-8">
+          <Card>
+            <CardHeader>
               <div className="flex items-center justify-between">
-                {/* Player 1 */}
-                <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/20 ring-2 ring-primary">
-                    <Sparkles className="h-7 w-7 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-lg">{matchData.player1.name}</p>
-                    <p className="text-sm text-muted-foreground">{matchData.player1.nft}</p>
-                  </div>
-                </div>
-
-                {/* VS Badge */}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary border-2 border-border">
-                    <span className="text-lg font-bold text-gradient-neon">VS</span>
-                  </div>
-                  <Badge variant="outline" className="text-xs">
-                    <Trophy className="h-3 w-3 mr-1" />
-                    {matchData.totalStake} XP
-                  </Badge>
-                </div>
-
-                {/* Player 2 */}
-                <div className="flex items-center gap-4 flex-row-reverse">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-accent/20 ring-2 ring-accent">
-                    <Sparkles className="h-7 w-7 text-accent" />
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-lg">{matchData.player2.name}</p>
-                    <p className="text-sm text-muted-foreground">{matchData.player2.nft}</p>
-                  </div>
-                </div>
+                <CardTitle className="text-2xl">Tic-Tac-Toe</CardTitle>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
               </div>
             </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-center space-y-4">
+                <div className="text-6xl">🎮</div>
+                <h2 className="text-xl font-semibold">Single Player Demo</h2>
+                <p className="text-muted-foreground">
+                  Play Tic-Tac-Toe against yourself on the blockchain!
+                </p>
+                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <p className="text-sm text-blue-900 dark:text-blue-100">
+                    <strong>ℹ️ Single player mode.</strong> You control both the X and O.
+                  </p>
+                </div>
+                
+                <div className="bg-muted p-4 rounded-lg text-sm space-y-2">
+                  <div><strong>Chain:</strong> {ENV.MAIN_CHAIN_ID?.slice(0, 8)}...</div>
+                  <div><strong>App:</strong> {ENV.APP_ID?.slice(0, 8)}...</div>
+                </div>
+                
+                <Button 
+                  onClick={handleStartGame} 
+                  disabled={loading}
+                  size="lg"
+                  className="w-full sm:w-auto"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Starting...
+                    </>
+                  ) : (
+                    <>
+                      Start Single Player Game
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
           </Card>
-
-          {/* Game Board */}
-          <div className="flex justify-center">
-            <TicTacToe
-              player1Name={matchData.player1.name}
-              player2Name={matchData.player2.name}
-              onGameEnd={handleGameEnd}
-            />
-          </div>
-
-          {/* Game Result Overlay */}
-          {gameEnded && gameResult && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
-              <Card className="border-border bg-card max-w-sm w-full mx-4 animate-scale-in">
-                <CardContent className="flex flex-col items-center gap-4 p-8">
-                  <div className={`flex h-20 w-20 items-center justify-center rounded-full ${
-                    gameResult.status === "draw" 
-                      ? "bg-secondary" 
-                      : gameResult.winner === "X" 
-                        ? "bg-success/20 animate-glow-pulse" 
-                        : "bg-accent/20"
-                  }`}>
-                    {gameResult.status === "draw" ? (
-                      <Swords className="h-10 w-10 text-muted-foreground" />
-                    ) : (
-                      <Trophy className={`h-10 w-10 ${
-                        gameResult.winner === "X" ? "text-success" : "text-accent"
-                      }`} />
-                    )}
-                  </div>
-                  <CardTitle className={`text-2xl ${
-                    gameResult.status === "draw" 
-                      ? "text-muted-foreground" 
-                      : gameResult.winner === "X" 
-                        ? "text-success" 
-                        : "text-accent"
-                  }`}>
-                    {gameResult.status === "draw" 
-                      ? "It's a Draw!" 
-                      : `${gameResult.winner === "X" ? matchData.player1.name : matchData.player2.name} Wins!`
-                    }
-                  </CardTitle>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm">Redirecting to results...</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
         </div>
+      </Layout>
+    );
+  }
+
+  // Game active - show board
+  const currentPlayer = getCurrentPlayer(gameState.board.movesCount);
+  
+  return (
+    <Layout>
+      <div className="container max-w-4xl mx-auto px-4 py-8">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl">Tic-Tac-Toe - Single Player Demo</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Game Status */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                {gameOver ? (
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-yellow-500" />
+                    <span className="font-semibold">
+                      {winner === 'Draw' ? 'Draw!' : `Player ${winner} Wins!`}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">
+                      Current Turn: Player {currentPlayer}
+                    </Badge>
+                  </div>
+                )}
+                <div className="text-sm text-muted-foreground">
+                  Moves: {gameState.board.movesCount}
+                </div>
+              </div>
+            </div>
+
+            {/* Game Board */}
+            <div className="flex justify-center">
+              <TicTacToe
+                board={gameState.board.cells}
+                onMove={handleMove}
+                disabled={processing || gameOver}
+                currentPlayer={currentPlayer}
+              />
+            </div>
+
+            {/* Processing Indicator */}
+            {processing && (
+              <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Processing move...</span>
+              </div>
+            )}
+
+            {/* Play Again Button */}
+            {gameOver && (
+              <div className="text-center">
+                <Button onClick={handleStartGame} disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Starting...
+                    </>
+                  ) : (
+                    'Play Again'
+                  )}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

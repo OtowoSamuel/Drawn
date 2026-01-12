@@ -10,7 +10,7 @@ use linera_sdk::{
     ServiceRuntime,
 };
 
-use tictactoe::{Operation, Game, PlayerStats};
+use tictactoe::Operation;
 use self::state::TicTacToeState;
 
 pub struct TicTacToeService {
@@ -46,7 +46,7 @@ impl Service for TicTacToeService {
             EmptySubscription,
         )
         .finish();
-        
+
         schema.execute(query).await
     }
 }
@@ -57,23 +57,12 @@ struct QueryRoot {
 
 #[Object]
 impl QueryRoot {
-    /// Get the next game ID that will be created
-    async fn next_game_id(&self) -> u64 {
-        *self.state.next_game_id.get()
-    }
-    
-    /// Get total number of games created
-    async fn total_games(&self) -> u64 {
-        *self.state.total_games.get()
-    }
-    
-    /// Get a specific game by ID
-    async fn game(&self, game_id: u64) -> Option<Game> {
-        self.state.get_game(game_id).await
-    }
-    
-    /// Get player statistics
-    async fn player_stats(&self, address: String) -> Option<PlayerStats> {
-        self.state.get_player_stats(&address).await
+    /// Get the state (for debugging)
+    /// Returns the full TicTacToeState which includes:
+    /// - players (if on a game chain)
+    /// - board (if on a game chain)
+    /// - game_chains (if on main chain)
+    async fn state(&self) -> &TicTacToeState {
+        &self.state
     }
 }
