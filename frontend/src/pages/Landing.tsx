@@ -20,27 +20,27 @@ import Layout from "@/components/Layout";
 const Landing = () => {
   const steps = [
     {
-      icon: Sparkles,
-      title: "Create Your NFT",
+      icon: Gamepad2,
+      title: "Start Playing",
       description:
-        "Generate a unique digital collectible to represent you in battle.",
+        "Jump straight into classic Tic-Tac-Toe matches on the blockchain.",
     },
     {
       icon: Swords,
-      title: "Battle Opponents",
+      title: "Challenge Opponents",
       description:
-        "Challenge rivals in strategic Tic-Tac-Toe matches with stakes.",
+        "Play against another player in strategic turn-based battles.",
     },
     {
       icon: Trophy,
-      title: "Win or Lose",
+      title: "Win or Learn",
       description:
-        "Victory evolves your NFT. Defeat means learning and growth.",
+        "Victory brings glory. Defeat brings experience and improvement.",
     },
     {
       icon: TrendingUp,
-      title: "Rank Up",
-      description: "Climb the leaderboard and earn exclusive rewards.",
+      title: "More Features Coming",
+      description: "NFT rewards, profiles, and leaderboards coming soon!",
     },
   ];
 
@@ -57,26 +57,26 @@ const Landing = () => {
           <div className="mx-auto max-w-3xl space-y-8 animate-fade-in">
             {/* Headline */}
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              <span className="text-gradient-neon">Create. Battle.</span>
+              <span className="text-gradient-neon">Play. Battle.</span>
               <br />
-              <span className="text-foreground">Evolve Your NFTs.</span>
+              <span className="text-foreground">Win on the Blockchain.</span>
             </h1>
 
             {/* Subheadline */}
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl">
-              Join a global community of creators. Mint unique collectibles,
-              challenge rivals in strategic battles, and climb the ranks.
+              Play classic Tic-Tac-Toe with true blockchain gameplay.
+              Challenge opponents in real-time matches with provable fairness.
             </p>
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/create-profile">
+              <Link to="/game">
                 <Button variant="neon" size="xl" className="group">
-                  Get Started
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  Play Tic-Tac-Toe
+                  <Gamepad2 className="h-5 w-5 ml-2 transition-transform group-hover:scale-110" />
                 </Button>
               </Link>
-              <Link to="/lobby">
+              <Link to="/game">
                 <Button variant="neon-outline" size="xl">
                   <Gamepad2 className="h-5 w-5" />
                   Open Lobby

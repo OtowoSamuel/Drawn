@@ -1,118 +1,234 @@
-# Drawn
+# Drawn - Blockchain Tic-Tac-Toe
 
-Drawn is a modular dApp scaffold that separates concerns across three layers: frontend, backend, and blockchain contracts. This repository provides starter code and guidance so you can iterate quickly on the UI, API, and smart contract logic.
+**Wave 5 Submission: Single-Player Demo**
 
-## 🚀 Quick Start (Buildathon Submission)
+A fully functional blockchain-based Tic-Tac-Toe game built on Linera. This Wave 5 submission demonstrates core blockchain integration with a working single-player mode.
 
-**For buildathon judges and testers:**
+##  What We Built
 
-```bash
-docker compose up --force-recreate
-```
+✅ **Working Features (Wave 5):**
+- Complete Linera smart contract implementation (Rust)
+- React frontend with real-time GraphQL polling
+- Single-player gameplay (control both X and O)
+- Blockchain state persistence
+- Docker deployment ready
+- Winner status determined immediately game is over
 
-Then visit http://localhost:5173
+##  Quick Start
 
-See [`BUILDATHON.md`](./BUILDATHON.md) for complete instructions and [`QUICK_REFERENCE.md`](./QUICK_REFERENCE.md) for a summary.
-
-## Key design principles
-- Clear separation of concerns: UI (frontend), application & persistence (backend), and on-chain logic (contracts).
-- Practical defaults: Next.js + Tailwind for frontend, Node/Express for lightweight backend APIs, IPFS for asset storage.
-- Chain-accurate contracts: This project targets Linera-style Rust smart contracts (not Solidity). See the Contracts section for details.
-
-Technical architecture (high-level)
-
-- Frontend
-	- React (Next.js is used in this scaffold but plain React/Vite is fine)
-	- Tailwind CSS for styling
-	- Wallet integration: Linear/Linera Wallet SDK or other compatible wallet provider (connect, sign transactions)
-
-- Backend
-	- Node.js + Express for simple API endpoints and relayer logic
-	- Optional persistence: Supabase or Firebase for user and game state
-	- Optional IPFS/Pinata pinning service for storing sticker assets & metadata
-
-- Blockchain layer
-	- Linera-style chain (Rust-based smart contracts). Smart contracts should be implemented in Rust using the chain's recommended SDK/tooling.
-	- On-chain modules to implement: NFT minting, gameplay state/logic, and rewards distribution.
-
-- Storage
-	- Asset & metadata storage: IPFS (pin with Pinata or other pinning provider). Store immutable URIs on-chain.
-
-Repository layout
-
-- `frontend/` — Next.js + Tailwind starter, sample pages, and a notes file for wallet integration.
-- `backend/` — Express server skeleton and placeholder endpoints (metadata, health). Add Supabase/Firebase integration here.
-- `contracts/` — Placeholder for smart contracts. IMPORTANT: the scaffold currently contains Solidity examples; the project should be migrated to Rust smart contracts for Linera. See Contracts section for recommended approach.
-- `tests/` — Guidance and placeholders for running contract and backend tests.
-
-Quick start (local development)
-
-1) Frontend
+### Option 1: Docker (Recommended for Judges)
 
 ```bash
-cd frontend
-npm install
-npm run dev
-# open http://localhost:3000
+docker compose up --build
 ```
 
-2) Backend
+Then visit: **http://localhost:5173**
+
+### Option 2: Local Development
 
 ```bash
-cd backend
-npm install
-npm run dev
-# default: http://localhost:3001
-curl http://localhost:3001/health
-curl http://localhost:3001/api/metadata/1
+./run.bash
 ```
 
-3) Contracts (Rust / Linera)
+Then visit: **http://localhost:5173**
 
-The contracts are implemented in Rust for the Linera blockchain. See `contracts/README.md` for full documentation.
+---
 
-Quick build and test:
+##  How to Play
+
+1. Click **"Play Tic-Tac-Toe"**
+2. Click any cell to place X
+3. Click another cell to place O
+4. Continue alternating until someone wins or draws
+5. Click **"Play Again"** to start a new game
+
+**Note:** This is a single-player demo where you control both players. Further integration and building is done for NFT creation, multiplayer gameplay and more
+
+---
+
+##  Architecture
+
+```
+┌─────────────────────────────────────┐
+│         Docker Container            │
+│                                     │
+│  ┌─────────────┐  ┌──────────────┐ │
+│  │  Linera     │  │  Frontend    │ │
+│  │  Contracts  │  │  (React)     │ │
+│  │  (Rust)     │  │  + Vite      │ │
+│  │             │  │              │ │
+│  │  Port 8081  │  │  Port 5173   │ │
+│  │  GraphQL    │  │              │ │
+│  └──────┬──────┘  └──────┬───────┘ │
+│         │                 │         │
+│    Blockchain State Sync (1s poll) │
+└─────────────────────────────────────┘
+```
+
+**Tech Stack:**
+- **Blockchain:** Linera (version 15.8)
+- **Smart Contracts:** Rust (1.86)
+- **Frontend:** React + TypeScript + Vite
+- **Styling:** Tailwind CSS + shadcn/ui
+
+---
+
+##  Project Structure
+
+```
+Drawn/
+├── contracts/          # Rust smart contracts (BACKEND)
+│   ├── src/
+│   │   ├── contract.rs  # Game logic & operations
+│   │   ├── service.rs   # GraphQL query service
+│   │   ├── state.rs     # Blockchain state
+│   │   └── lib.rs       # Types & game rules
+├── frontend/           # React frontend
+│   ├── src/
+│   │   ├── pages/       # Game page
+│   │   ├── components/  # TicTacToe board
+│   │   └── lib/         # GraphQL client
+├── run.bash            # Startup script
+├── Dockerfile          # Container definition
+└── compose.yaml        # Docker Compose config
+```
+
+
+---
+
+##  Current Implementation (Wave 5)
+
+### Smart Contracts (`contracts/src/`)
+
+**✅ Implemented:**
+- `Operation::Start` - Initialize game with two players
+- `Operation::MakeMove` - Submit move to blockchain
+- Game state validation (bounds checking, turn logic)
+- Winner detection (rows, columns, diagonals)
+- Draw detection
+
+**Contract Features:**
+- State persists on blockchain
+- Mutations return transaction hashes
+- GraphQL queries for real-time state
+- Board represented as 9-cell array
+
+### Frontend (`frontend/src/`)
+
+**✅ Implemented:**
+- Single-page game interface
+- Real-time state polling (1 second interval)
+- Click-to-play interaction
+- Win/draw detection UI
+- Responsive design (mobile-ready)
+
+**Integration:**
+- GraphQL client for blockchain
+- Environment-based configuration
+- Auto-configured by `run.bash`
+
+---
+
+##  Future Development Plans
+
+### Wave 6+ Roadmap
+
+**Multiplayer Mode:**
+- [ ] Lobby system for matchmaking
+- [ ] Game invites via chain messaging
+- [ ] Spectator mode
+- [ ] Game history/replay
+
+**Authentication:**
+- [ ] Linera wallet integration (Once deployed onto testnet and mainnet)
+- [ ] Player profiles on-chain
+- [ ] Username registration
+
+**Competitive Features:**
+- [ ] Leaderboard (ELO rating)
+- [ ] Tournament brackets
+- [ ] Ranked matches
+- [ ] Seasonal rewards
+
+**Enhanced Gameplay:**
+- [ ] Multiple board sizes (4x4, 5x5)
+- [ ] Game variants (3D tic-tac-toe)
+- [ ] Custom themes and skins
+- [ ] Animated moves
+
+**NFT Integration:**
+- [ ] NFT profile pictures
+- [ ] Collectible board skins
+- [ ] Achievement badges
+
+**Analytics:**
+- [ ] Move history tracking
+- [ ] Win rate statistics
+- [ ] Popular opening moves
+- [ ] Player insights
+
+---
+
+##  Development
+
+### Prerequisites
+
+- Rust (latest stable)
+- Node.js LTS
+- Docker (optional)
+- Linera CLI 15.8
+
+### Local Setup
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/zaneal34/Drawn.git
+cd Drawn
+```
+
+2. **Run the app:**
+```bash
+docker compose up --build
+```
+
+3. **Open browser:**
+```
+http://localhost:5173
+```
+
+
+---
+
+## 👥 Team
+
+| Name | Role | GitHub |
+|------|------|--------|
+| **Samuel Otowo** | Senior Lead Developer + Smart Contract | [OtowoSamuel](https://github.com/OtowoSamuel) |
+| **Zaneal** | Lead Developer | [@zaneal343](https://github.com/zaneal343) |
+
+---
+
+## 📝 License - Open Source
+
+MIT License - see [LICENSE](./LICENSE) for details
+
+---
+
+## 🙏 Acknowledgments
+
+Built for the Linera Buildathon Wave 5
+
+**Resources:**
+- [Linera Documentation](https://linera.dev)
+- Inspired by microchess and linot examples
+- shadcn/ui for beautiful components
+
+---
+
+##  Try It Now!
 
 ```bash
-cd contracts
-cargo test
-cargo build --release --target wasm32-unknown-unknown
+docker compose up --build
+# Visit http://localhost:5173/gamex
 ```
-
-The WASM bytecode will be at:
-- `target/wasm32-unknown-unknown/release/drawn_contract.wasm`
-- `target/wasm32-unknown-unknown/release/drawn_service.wasm`
-
-See `contracts/EXAMPLES.md` for GraphQL query/mutation examples.
-
-Testing
-
-- Backend: Jest + Supertest are configured in `backend/package.json` (placeholder). Run `npm test` in `backend/`.
-- Contracts: write Rust unit tests (`cargo test`) and integration tests that run against a local devnet.
-
-Environment & configuration
-
-- Use `.env` files at the `backend/` and `frontend/` levels for API keys, DB URLs, pinata keys, wallet redirect URIs, etc. Example entries:
-	- `SUPABASE_URL`, `SUPABASE_KEY`
-	- `PINATA_API_KEY`, `PINATA_SECRET`
-	- `LINERA_RPC_URL`, `LINERA_PRIVATE_KEY`
-
-Security & best practices
-
-- Keep private keys and secrets out of source control. Use environment variables and secure storage for CI.
-- Validate and sanitize any user-supplied data on the backend before interacting with the chain.
-- For on-chain logic, prioritize formal reasoning and audits for economic or access controls.
-
-CI / automation suggestions
-
-- Add a CI workflow to run backend unit tests and contract unit tests (Rust `cargo test`) on push/PR.
-- Add a linting/format check for Rust (rustfmt/clippy) and JS (eslint / prettier) in CI.
-
-
-Contacts & references
-
-- Linera / chain docs: follow the official chain documentation for contract toolchain and SDK details.
-- IPFS / Pinata docs for pinning APIs.
-
-
 

@@ -2,66 +2,126 @@
 
 set -eu
 
-echo "🚀 Starting Linera local network..."
-eval "$(linera net helper)"
-linera_spawn linera net up --with-faucet
+# ============================================================================
+# Drawn Tic-Tac-Toe - Local Deployment Script  
+# Template-compliant with auto-extraction
+# ============================================================================
 
-export LINERA_FAUCET_URL=http://localhost:8080
-echo "📡 Initializing wallet with faucet: $LINERA_FAUCET_URL"
-linera wallet init --faucet="$LINERA_FAUCET_URL"
-linera wallet request-chain --faucet="$LINERA_FAUCET_URL"
+echo "Drawn Tic-Tac-Toe - Local Deployment"
+echo "========================================"
 
-# Build and publish the Drawn contract
-echo "🔨 Building Drawn contract..."
-cd /build/contracts
-rustup target add wasm32-unknown-unknown
+# Configuration - Template standard: faucet on 8080
+FAUCET_PORT=8080
+SERVICE_PORT=8081
+
+# Setup PATH and environment
+export PATH="$PWD/target/debug:$PATH"
+source /dev/stdin <<<"$(linera net helper 2>/dev/null)"
+
+# Start Linera network
+echo "🚀 Starting Linera network..."
+linera_spawn linera net up --with-faucet --faucet-port $FAUCET_PORT
+
+# Wait for network to stabilize
+sleep 2
+
+echo "READY!"
+
+# Set environment variables for wallet
+export LINERA_WALLET_1="$LINERA_TMP_DIR/wallet_1.json"
+export LINERA_KEYSTORE_1="$LINERA_TMP_DIR/keystore_1.json"
+export LINERA_STORAGE_1="rocksdb:$LINERA_TMP_DIR/client_1.db"
+
+FAUCET_URL="http://localhost:$FAUCET_PORT"
+
+# Initialize wallet
+echo "💼 Initializing wallet..."
+linera --with-wallet 1 wallet init --faucet "$FAUCET_URL"
+
+# Request chain from faucet and extract chain ID + owner address
+echo "⛓️  Requesting chain from faucet..."
+CHAIN_OUTPUT=$(linera --with-wallet 1 wallet request-chain --faucet "$FAUCET_URL" 2>&1)
+
+# Extract chain ID (first 64-char hex line)
+CHAIN_1=$(echo "$CHAIN_OUTPUT" | grep -E '^[a-f0-9]{64}$' | head -1)
+
+# Extract owner address from log line: "Requesting a new chain for owner 0x..."
+OWNER_ADDRESS=$(echo "$CHAIN_OUTPUT" | grep -oP 'owner\s+\K0x[0-9a-f]{64}' | head -1)
+
+echo "✅ Main Chain: $CHAIN_1"
+echo "✅ Owner Address: $OWNER_ADDRESS"
+
+# Sync wallet
+linera --with-wallet 1 sync && linera --with-wallet 1 query-balance
+
+# Build contracts
+echo "Building contracts..."
+cd contracts
 cargo build --release --target wasm32-unknown-unknown
+cd ..
 
-echo "📦 Publishing Drawn application to local network..."
-BYTECODE_ID=$(linera publish-bytecode \
-  target/wasm32-unknown-unknown/release/drawn_contract.wasm \
-  target/wasm32-unknown-unknown/release/drawn_service.wasm)
+# Deploy application
+echo "Deploying Tic-Tac-Toe application..."
+cd contracts
 
-echo "Bytecode ID: $BYTECODE_ID"
+# Deploy using 'linera project publish-and-create'
+APP_ID=$(linera --with-wallet 1 --wait-for-outgoing-messages project publish-and-create .)
 
-echo "🎮 Creating Drawn application instance..."
-APP_ID=$(linera create-application $BYTECODE_ID)
+cd ..
 
-echo "Application ID: $APP_ID"
-export DRAWN_APP_ID=$APP_ID
+if [ -z "$APP_ID" ]; then
+  echo "❌ Failed to deploy application!"
+  exit 1
+fi
 
-# Get the chain ID
-CHAIN_ID=$(linera wallet show | grep "Public Key" -A 1 | tail -n 1 | awk '{print $1}')
-export DRAWN_CHAIN_ID=$CHAIN_ID
+echo "✅ Application deployed: $APP_ID"
 
-echo "Chain ID: $CHAIN_ID"
+# Start GraphQL service
+echo "Starting GraphQL service on port $SERVICE_PORT..."
+linera --with-wallet 1 service --port $SERVICE_PORT &
+sleep 2
 
-# Start the Linera node service
-echo "🌐 Starting Linera node service on port 8080..."
-linera_spawn linera service --port 8080 --listener-skip-process-inbox
+# Configure frontend with ALL needed variables
+echo "⚙️  Configuring frontend..."
+cd frontend
 
-# Wait for service to be ready
-sleep 3
-
-echo "✅ Drawn contract deployed successfully!"
-echo "📍 GraphiQL: http://localhost:8080/chains/$CHAIN_ID/applications/$APP_ID"
-
-# Build and run the frontend
-echo "🎨 Setting up frontend..."
-cd /build/frontend
-
-# Source nvm to make node/npm available
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-pnpm install
-
-# Create .env.local with contract details
 cat > .env.local <<EOF
-NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:8080/chains/$CHAIN_ID/applications/$APP_ID
-NEXT_PUBLIC_CHAIN_ID=$CHAIN_ID
-NEXT_PUBLIC_APP_ID=$APP_ID
+VITE_APP_ID=$APP_ID
+VITE_CHAIN_ID=$CHAIN_1
+VITE_OWNER_ADDRESS=$OWNER_ADDRESS
+VITE_GRAPHQL_ENDPOINT=http://localhost:$SERVICE_PORT
 EOF
 
-echo "🎯 Starting frontend on port 5173..."
-pnpm dev --host 0.0.0.0 --port 5173
+echo "✅ Frontend configured"
+
+# Install frontend dependencies if needed
+if [ ! -d "node_modules" ]; then
+  echo "📦 Installing frontend dependencies..."
+  npm install
+fi
+
+echo ""
+echo "════════════════════════════════════════"
+echo "  🎮 Drawn Tic-Tac-Toe Ready!"
+echo "════════════════════════════════════════"
+echo ""
+echo "  Main Chain:  $CHAIN_1"
+echo "  Application: $APP_ID"  
+echo "  Owner:       $OWNER_ADDRESS"
+echo ""
+echo "  GraphQL Service:"
+echo "  http://localhost:$SERVICE_PORT"
+echo ""
+echo "  GraphQL IDE:"
+echo "  http://localhost:$SERVICE_PORT/chains/$CHAIN_1/applications/$APP_ID"
+echo ""
+echo "  Frontend will start at:"
+echo "  http://localhost:5173"
+echo ""
+echo "════════════════════════════════════════"
+echo ""
+echo "🚀 Starting frontend..."
+echo ""
+
+# Start frontend dev server
+npm run dev
