@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
     jq \
     curl
 
-# Install Linera services (version 15.8)
-RUN cargo install --locked linera-service@15.8 linera-storage-service@15.8
+# Install Linera services (version 0.15.8)
+RUN cargo install --locked linera-service@0.15.8 linera-storage-service@0.15.8
 
 # Install Node.js LTS (for frontend)
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
